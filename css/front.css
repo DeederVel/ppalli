@@ -1,0 +1,70 @@
+.dvliveblog_cont {
+    width: 100%;
+    padding: 10px;
+}
+
+.dvliveblog_editor_cont {
+    width: 100%;
+    display: flex;
+}
+
+.dvliveblog_editor_text {
+    width: 100%;
+    border: 1px solid #1e7e34;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.dvliveblog_editor_submit {
+    color: #ffffff;
+    background: #1e7e34;
+    border: 0px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.dvliveblog_post_infos {
+    display: flex;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+img.dvliveblog_author_avt {
+    height: 50px;
+    width: auto;
+    border-radius: 50px;
+    position: relative;
+    bottom: 5px;
+    margin-right: 25px;
+}
+
+.dvliveblog_author {
+    margin-right: 25px;
+}
+
+.dvliveblog_time {
+    position: absolute;
+    right: 10px;
+    font-size: 14px;
+}
+
+.dvliveblog_post {
+    width: 100%;
+    position: relative;
+    background: #f3f3f3;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px 0px;
+}
+
+.dvliveblog_post_content {
+    background: #ffffff;
+    border: 1px solid #ebebeb;
+    border-radius: 10px;
+    padding-left: 10px;
+    margin-top: 10px;
+}
+
+.dvliveblog_post_hid {
+    display: none;
+}
