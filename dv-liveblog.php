@@ -37,6 +37,12 @@ function liveblog_render($title, $refreshrate) {
         $p = str_replace('{{authorname}}', $author->display_name, $p);
         $p = str_replace('{{time}}', $time, $p);
         $p = str_replace('{{content}}', $bp->content, $p);
+        if ( checkUserIsAble(wp_get_current_user()) ) {
+            $p = str_replace('{{adminactions}}', file_get_contents(LIVEBLOG_PLUGINPATH . '/html/admin_actions.html'), $p);
+        } else {
+            $p = str_replace('{{adminactions}}', '', $p);
+        }
+        $p = str_replace('{{itemID}}', $bp->id, $p);
         $content .= $p;
     }
     $ret = $mainTemplate;
@@ -73,10 +79,31 @@ function liveblog_update($lastIDrem, $postIDrem) {
         $p = str_replace('{{authorname}}', $author->display_name, $p);
         $p = str_replace('{{time}}', $time, $p);
         $p = str_replace('{{content}}', $bp->content, $p);
+        if ( checkUserIsAble(wp_get_current_user()) ) {
+            $p = str_replace('{{adminactions}}', file_get_contents(LIVEBLOG_PLUGINPATH . '/html/admin_actions.html'), $p);
+        } else {
+            $p = str_replace('{{adminactions}}', '', $p);
+        }
+        $p = str_replace('{{itemID}}', $bp->id, $p);
         $content .= $p;
     }
     $contentnew = (isset($lastID));
     return ["content" => $content, "lastID" => $lastID, "refresh" => $contentnew];
+}
+
+function liveblog_delete(int $itemID, int $postID) {
+    global $wpdb;
+    $user = wp_get_current_user();
+    if(checkUserIsAble($user)) {
+        $wpdb->delete( ($wpdb->prefix.'dvliveblog') , [
+            'id' => $itemID,
+            'post_id' => $postID,
+        ]);
+
+        return wp_send_json(["result" => true]);
+    } else {
+        return wp_send_json(["result" => false]);
+    }
 }
 
 function liveblog_sc_handler($atts) {
@@ -124,6 +151,12 @@ function dvliveblog_frontend_putter() {
     }
 }
 
+function dvliveblog_frontend_deleter() {
+    $item = intval($_POST['itemID']);
+    $post = intval($_POST["postID"]);
+    return liveblog_delete($item, $post);
+}
+
 function liveblog_loadFrontEndScript() {
     if( !is_single() ) return;
     $title_nonce = wp_create_nonce( 'dvliveblog_enqueue_refresher' );
@@ -163,4 +196,6 @@ add_action( 'wp_ajax_dvliveblog_frontend_handler', 'dvliveblog_frontend_handler'
 add_action( 'wp_ajax_nopriv_dvliveblog_frontend_handler', 'dvliveblog_frontend_handler' );
 add_action( 'wp_ajax_dvliveblog_frontend_putter', 'dvliveblog_frontend_putter' );
 add_action( 'wp_ajax_nopriv_dvliveblog_frontend_putter', 'dvliveblog_frontend_putter' );
+add_action( 'wp_ajax_dvliveblog_frontend_deleter', 'dvliveblog_frontend_deleter' );
+add_action( 'wp_ajax_nopriv_dvliveblog_frontend_deleter', 'dvliveblog_frontend_deleter' );
 add_action( 'wp_enqueue_scripts', 'liveblog_loadFrontEndScript' );

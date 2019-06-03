@@ -16,6 +16,9 @@ jQuery(document).ready(function($) {
                     $(this).toggleClass('dvliveblog_post_hid');
                     $(this).toggleClass('dvliveblog_post');
                 })
+                $(".dvliveblog_deleteBT").click(function() {
+                    deleteLiveBlog($(this));
+                });
                 dvliveblog_lastID = data.lastID;
             }
         });
@@ -38,8 +41,29 @@ jQuery(document).ready(function($) {
         });
     }
 
+    function deleteLiveBlog(el) {
+        waitUpdate = true;
+        $.post(dvliveblog_enqueue_refresher_obj.ajax_url, {
+            _ajax_nonce: dvliveblog_enqueue_refresher_obj.nonce,
+            action: "dvliveblog_frontend_deleter",
+            postID: dvliveblog_postID,
+            itemID: el.data('ppalli-itemid')
+        }, function(data) {
+            if(data.result) {
+                el.closest(".dvliveblog_post").remove();
+            } else {
+                alert("Errore nella cancellazione");
+            }
+            waitUpdate = false;
+        });
+    }
+
     $("#dvliveblog_editor_submit").click(function () {
         if (!waitUpdate) { updateLiveBlog(); }
+    });
+
+    $(".dvliveblog_deleteBT").click(function() {
+        deleteLiveBlog($(this));
     });
 
     $("#dvliveblog_editor_text").focus(function() {

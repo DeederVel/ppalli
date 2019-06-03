@@ -68,3 +68,13 @@ img.dvliveblog_author_avt {
 .dvliveblog_post_hid {
     display: none;
 }
+
+.dvliveblog_adminactions {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+}
+
+.dvliveblog_adminactions .dvliveblog_deleteBT {
+    color: red;
+}
