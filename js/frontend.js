@@ -19,8 +19,6 @@ jQuery(document).ready(function($) {
                 $("#dvliveblog_post_cont").prepend(data.content);
                 $(".dvliveblog_post_hid").each(function() {
                     $(this).show(250);
-                    // $(this).toggleClass('dvliveblog_post_hid');
-                    // $(this).toggleClass('dvliveblog_post');
                 })
                 $(".dvliveblog_deleteBT").click(function() {
                     deleteLiveBlog($(this));
@@ -54,8 +52,6 @@ jQuery(document).ready(function($) {
             if(data.result) {
                 changeIconEditor();
                 setTimeout(changeIconEditor, 2000);
-            } else {
-                alert("Errore nell'invio dell'aggiornamento");
             }
             waitUpdate = false;
         });
@@ -71,8 +67,6 @@ jQuery(document).ready(function($) {
         }, function(data) {
             if(data.result) {
                 el.closest(".dvliveblog_post").remove();
-            } else {
-                alert("Errore nella cancellazione");
             }
             waitUpdate = false;
         });
@@ -98,7 +92,6 @@ jQuery(document).ready(function($) {
 
     tinymce.init({
         selector: '#dvliveblog_editor_text',
-        language: 'it_IT',
         plugins: [
             'advlist autolink link image lists charmap anchor ',
             'wordcount visualblocks media',

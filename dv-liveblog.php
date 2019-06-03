@@ -9,7 +9,7 @@
  * License:    CC BY-NC-SA 4.0
  * License URI: http://creativecommons.org/licenses/by-nc-sa/4.0/
  * Text Domain: dvliveblog
- * Domain Path: /languages
+ * Domain Path: /lang
  */
 
 require_once(dirname( __FILE__ ).'/Ppalli.php');
@@ -32,7 +32,7 @@ function liveblog_delete(int $itemID, int $postID) {
     return wp_send_json($ppalli->deleteMoment($itemID));
 }
 
-function liveblog_sc_handler($atts) {
+function dvliveblog_sc_handler($atts) {
     wp_enqueue_style(
         'dvamazon',
         plugins_url( '/css/front.css', __FILE__ )
@@ -63,7 +63,7 @@ function dvliveblog_frontend_deleter() {
     return liveblog_delete($item, $post);
 }
 
-function liveblog_loadFrontEndScript() {
+function dvliveblog_loadFrontEndScript() {
     if( !is_single() ) return;
     $title_nonce = wp_create_nonce( 'dvliveblog_enqueue_refresher' );
     wp_enqueue_script( 'liveblog-frontend-editor',
@@ -100,12 +100,17 @@ $sql = "CREATE TABLE $tableName (
     dbDelta( $sql );
 }
 
+function dvliveblog_load_textdomain() {
+    load_plugin_textdomain( 'dvliveblog', FALSE, basename( dirname( __FILE__ ) ) . '/lang/' );
+}
+
 register_activation_hook( __FILE__, 'dvliveblog_initTable' );
-add_shortcode( 'liveblog', 'liveblog_sc_handler' );
+add_shortcode( 'liveblog', 'dvliveblog_sc_handler' );
 add_action( 'wp_ajax_dvliveblog_frontend_handler', 'dvliveblog_frontend_handler' );
 add_action( 'wp_ajax_nopriv_dvliveblog_frontend_handler', 'dvliveblog_frontend_handler' );
 add_action( 'wp_ajax_dvliveblog_frontend_putter', 'dvliveblog_frontend_putter' );
 add_action( 'wp_ajax_nopriv_dvliveblog_frontend_putter', 'dvliveblog_frontend_putter' );
 add_action( 'wp_ajax_dvliveblog_frontend_deleter', 'dvliveblog_frontend_deleter' );
 add_action( 'wp_ajax_nopriv_dvliveblog_frontend_deleter', 'dvliveblog_frontend_deleter' );
-add_action( 'wp_enqueue_scripts', 'liveblog_loadFrontEndScript' );
+add_action( 'wp_enqueue_scripts', 'dvliveblog_loadFrontEndScript' );
+add_action( 'plugins_loaded', 'dvliveblog_load_textdomain' );

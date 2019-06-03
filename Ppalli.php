@@ -17,8 +17,8 @@ class Ppalli {
         return (count(array_intersect($userroles, $userauth)) > 0);
     }
 
-    private function buildMoment($template, $moment, array $addClasses = []) { //template, moment
-        $time = (new \DateTime($moment->pub_time))->format('H:i:s @ d/m/Y');
+    private function buildMoment($template, $moment, array $addClasses = []) {
+        $time = (new \DateTime($moment->pub_time))->format('H:i:s'); //or H:i:s @ d/m/Y
         $author = get_user_by('id', $moment->author_id);
         if($moment->type > 0) {
         	$addClasses[] = "dvliveblog_post_type".$moment->type;
@@ -29,6 +29,7 @@ class Ppalli {
         $template = str_replace('{{content}}', stripslashes($moment->content), $template);
         if ( $this->checkUserIsAble(wp_get_current_user()) ) {
         	$template = str_replace('{{adminactions}}', file_get_contents(LIVEBLOG_PLUGINPATH . '/html/admin_actions.html'), $template);
+            $template = str_replace('{{str_remove}}', __('Remove', 'dvliveblog'), $template);
         } else {
         	$template = str_replace('{{adminactions}}', '', $template);
         }
@@ -60,10 +61,15 @@ class Ppalli {
 
         if ( $this->checkUserIsAble(wp_get_current_user()) ) {
             $ret = str_replace('{{editor}}', $editorTemplate, $ret);
+            $ret = str_replace('{{str_update}}', __('Update', 'dvliveblog'), $ret);
+            $ret = str_replace('{{str_option0}}', __('Normal', 'dvliveblog'), $ret);
+            $ret = str_replace('{{str_option1}}', __('Important', 'dvliveblog'), $ret);
+            $ret = str_replace('{{str_option2}}', __('Opinion', 'dvliveblog'), $ret);
         } else {
             $ret = str_replace('{{editor}}', '', $ret);
         }
         $ret = str_replace('{{title}}', $title, $ret);
+        $ret = str_replace('{{str_lastupdate}}', __('Last live refresh:', 'dvliveblog'), $ret);
         $ret = str_replace('{{content}}', $content, $ret);
         $time = (new \DateTime('now'))->format('H:i:s');
         $ret = str_replace('{{last_update}}', $time, $ret);
