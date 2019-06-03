@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Ppalli - Liveblogging plugin
+ * Plugin Name: Ppalli - Micro liveblogging plugin
  * Plugin URI: https://deedervel.com
  * Description: Micro liveblogging for Wordpress
  * Version:    2019.06.01
@@ -34,7 +34,7 @@ function liveblog_delete(int $itemID, int $postID) {
 
 function dvliveblog_sc_handler($atts) {
     wp_enqueue_style(
-        'dvamazon',
+        'dvliveblog',
         plugins_url( '/css/front.css', __FILE__ )
     );
     $lu = liveblog_render($atts['title'], intval($atts['secs']));
@@ -66,15 +66,15 @@ function dvliveblog_frontend_deleter() {
 function dvliveblog_loadFrontEndScript() {
     if( !is_single() ) return;
     $title_nonce = wp_create_nonce( 'dvliveblog_enqueue_refresher' );
-    wp_enqueue_script( 'liveblog-frontend-editor',
+    wp_enqueue_script( 'dvliveblog-frontend-editor',
         plugins_url( '/js/tinymce/tinymce.min.js', __FILE__ )
     );
-    wp_enqueue_script( 'liveblog-frontend-refresher',
+    wp_enqueue_script( 'dvliveblog-frontend-refresher',
         plugins_url( '/js/frontend.js', __FILE__ ),
         array( 'jquery' )
     );
-    wp_enqueue_script( 'liveblog-fontawesome', 'https://kit.fontawesome.com/74a8ff8d09.js');
-    wp_localize_script( 'liveblog-frontend-refresher', 'dvliveblog_enqueue_refresher_obj', array(
+    wp_enqueue_script( 'dvliveblog-fontawesome', 'https://kit.fontawesome.com/74a8ff8d09.js');
+    wp_localize_script( 'dvliveblog-frontend-refresher', 'dvliveblog_enqueue_refresher_obj', array(
        'ajax_url' => admin_url( 'admin-ajax.php' ),
        'nonce'    => $title_nonce,
     ) );
