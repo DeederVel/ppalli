@@ -12,8 +12,8 @@
  * Domain Path: /lang
  */
 
-require_once(dirname( __FILE__ ).'/Ppalli.php');
-use DeederVel\Ppalli as Ppalli;
+require_once(dirname( __FILE__ ).'/Core.php');
+use DeederVel\Core as Ppalli;
 
 function liveblog_render($title, $refreshrate) {
     global $post;

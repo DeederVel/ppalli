@@ -4,7 +4,7 @@ namespace DeederVel;
 
 define ('LIVEBLOG_PLUGINPATH', dirname( __FILE__ ));
 
-class Ppalli {
+class Core {
     private $post;
 
     public function __construct(int $postID) {
