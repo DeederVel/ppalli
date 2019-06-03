@@ -12,109 +12,32 @@
  * Domain Path: /languages
  */
 
-define ('LIVEBLOG_PLUGINPATH', dirname( __FILE__ ));
-
-function checkUserIsAble($user) {
-    $userroles = (array) $user->roles;
-    $userauth = ['administrator', 'editor', 'author'];
-    return (count(array_intersect($userroles, $userauth)) > 0);
-}
+require_once(dirname( __FILE__ ).'/Ppalli.php');
+use DeederVel\Ppalli as Ppalli;
 
 function liveblog_render($title, $refreshrate) {
-    global $wpdb, $post;
-    $blogposts = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}dvliveblog WHERE post_id = $post->ID ORDER BY id DESC");
-    $mainTemplate = file_get_contents(LIVEBLOG_PLUGINPATH . '/html/main_template.html');
-    $postTemplate = file_get_contents(LIVEBLOG_PLUGINPATH . '/html/post_template.html');
-    $editorTemplate = file_get_contents(LIVEBLOG_PLUGINPATH . '/html/editor_template.html');
-    $content = "";
-    $lastID = ($blogposts[0])->id;
-    if(!isset($lastID)) $lastID = 0;
-    foreach($blogposts as $bp) {
-        $p = $postTemplate;
-        $time = (new DateTime($bp->pub_time))->format('H:i @ d/m/Y');
-        $author = get_user_by('id', $bp->author_id);
-        $p = str_replace('{{authorimg}}', get_avatar_url($author), $p);
-        $p = str_replace('{{authorname}}', $author->display_name, $p);
-        $p = str_replace('{{time}}', $time, $p);
-        $p = str_replace('{{content}}', $bp->content, $p);
-        if ( checkUserIsAble(wp_get_current_user()) ) {
-            $p = str_replace('{{adminactions}}', file_get_contents(LIVEBLOG_PLUGINPATH . '/html/admin_actions.html'), $p);
-        } else {
-            $p = str_replace('{{adminactions}}', '', $p);
-        }
-        $p = str_replace('{{itemID}}', $bp->id, $p);
-        $content .= $p;
-    }
-    $ret = $mainTemplate;
-    $li = '<script>
-        var dvliveblog_lastID = '.$lastID.';
-        var dvliveblog_postID = '.$post->ID.';
-        var dvliveblog_refreshrate = '.$refreshrate.';
-    </script>
-    ';
-    $ret = str_replace('{{JSvars}}', $li, $ret);
-
-    if ( checkUserIsAble(wp_get_current_user()) ) {
-        $ret = str_replace('{{editor}}', $editorTemplate, $ret);
-    } else {
-        $ret = str_replace('{{editor}}', '', $ret);
-    }
-    $ret = str_replace('{{title}}', $title, $ret);
-    $ret = str_replace('{{content}}', $content, $ret);
-
-    return ["content" => $ret, "lastID" => $lastID];
+    global $post;
+    $refreshrate = ($refreshrate > 0) ? ($refreshrate * 1000) : 5000;
+    $ppalli = new Ppalli($post->ID);
+    return ($ppalli->getAllMoments($title, $refreshrate));
 }
 
-function liveblog_update($lastIDrem, $postIDrem) {
-    global $wpdb;
-    $blogposts = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}dvliveblog WHERE post_id = $postIDrem AND id > $lastIDrem ORDER BY pub_time DESC");
-    $postTemplate = file_get_contents(LIVEBLOG_PLUGINPATH . '/html/post_template_hid.html');
-    $content = "";
-    $lastID = ($blogposts[0])->id;
-    foreach($blogposts as $bp) {
-        $p = $postTemplate;
-        $time = (new DateTime($bp->pub_time))->format('H:i @ d/m/Y');
-        $author = get_user_by('id', $bp->author_id);
-        $p = str_replace('{{authorimg}}', get_avatar_url($author), $p);
-        $p = str_replace('{{authorname}}', $author->display_name, $p);
-        $p = str_replace('{{time}}', $time, $p);
-        $p = str_replace('{{content}}', $bp->content, $p);
-        if ( checkUserIsAble(wp_get_current_user()) ) {
-            $p = str_replace('{{adminactions}}', file_get_contents(LIVEBLOG_PLUGINPATH . '/html/admin_actions.html'), $p);
-        } else {
-            $p = str_replace('{{adminactions}}', '', $p);
-        }
-        $p = str_replace('{{itemID}}', $bp->id, $p);
-        $content .= $p;
-    }
-    $contentnew = (isset($lastID));
-    return ["content" => $content, "lastID" => $lastID, "refresh" => $contentnew];
+function liveblog_update($lastID, $postID) {
+    $ppalli = new Ppalli($postID);
+    return wp_send_json($ppalli->getNewMoments($lastID));
 }
 
 function liveblog_delete(int $itemID, int $postID) {
-    global $wpdb;
-    $user = wp_get_current_user();
-    if(checkUserIsAble($user)) {
-        $wpdb->delete( ($wpdb->prefix.'dvliveblog') , [
-            'id' => $itemID,
-            'post_id' => $postID,
-        ]);
-
-        return wp_send_json(["result" => true]);
-    } else {
-        return wp_send_json(["result" => false]);
-    }
+    $ppalli = new Ppalli($postID);
+    return wp_send_json($ppalli->deleteMoment($itemID));
 }
 
 function liveblog_sc_handler($atts) {
-    $title = $atts['title'];
-    $secs = intval($atts['secs']);
-    $refreshrate = ($secs > 0) ? ($secs * 1000) : 5000;
     wp_enqueue_style(
         'dvamazon',
         plugins_url( '/css/front.css', __FILE__ )
     );
-    $lu = liveblog_render($title, $refreshrate);
+    $lu = liveblog_render($atts['title'], intval($atts['secs']));
     return $lu["content"];
 }
 
@@ -126,29 +49,12 @@ function dvliveblog_frontend_handler() {
 }
 
 function dvliveblog_frontend_putter() {
-    global $wpdb;
     $user = wp_get_current_user();
-    if(checkUserIsAble($user)) {
-        $content = $_POST["content"];
-        $postID = intval($_POST["postID"]);
-        $wpdb->query(
-            $wpdb->prepare(
-                "
-                INSERT INTO {$wpdb->prefix}dvliveblog
-                ( post_id, type, content, author_id, pub_time )
-                VALUES ( %d, %d, %s, %d, CURRENT_TIME() )
-                ",
-                $postID,
-                0,
-                $content,
-                $user->ID
-            )
-        );
-
-        return wp_send_json(["result" => true]);
-    } else {
-        return wp_send_json(["result" => false]);
-    }
+    $content = $_POST["content"];
+    $postID = intval($_POST["postID"]);
+    $type = intval($_POST["type"]);
+    $ppalli = new Ppalli($postID);
+    return wp_send_json($ppalli->newMoment($user, $content, $type));
 }
 
 function dvliveblog_frontend_deleter() {
@@ -160,10 +66,14 @@ function dvliveblog_frontend_deleter() {
 function liveblog_loadFrontEndScript() {
     if( !is_single() ) return;
     $title_nonce = wp_create_nonce( 'dvliveblog_enqueue_refresher' );
+    wp_enqueue_script( 'liveblog-frontend-editor',
+        plugins_url( '/js/tinymce/tinymce.min.js', __FILE__ )
+    );
     wp_enqueue_script( 'liveblog-frontend-refresher',
         plugins_url( '/js/frontend.js', __FILE__ ),
         array( 'jquery' )
     );
+    wp_enqueue_script( 'liveblog-fontawesome', 'https://kit.fontawesome.com/74a8ff8d09.js');
     wp_localize_script( 'liveblog-frontend-refresher', 'dvliveblog_enqueue_refresher_obj', array(
        'ajax_url' => admin_url( 'admin-ajax.php' ),
        'nonce'    => $title_nonce,

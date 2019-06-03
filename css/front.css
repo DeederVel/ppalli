@@ -5,6 +5,9 @@
 
 .dvliveblog_editor_cont {
     width: 100%;
+}
+
+.dvliveblog_editor_cont_row {
     display: flex;
 }
 
@@ -12,14 +15,20 @@
     width: 100%;
     border: 1px solid #1e7e34;
     border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
 }
 
 .dvliveblog_editor_submit {
-    color: #ffffff;
-    background: #1e7e34;
+    color: #222222;
+    background: #f3f3f3;
+    font-weight: bold;
     border: 0px;
     border-top-right-radius: 10px;
+    word-break: normal;
+}
+
+.dvliveblog_editor_type {
+    width: 100%;
+    border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
 
@@ -77,4 +86,31 @@ img.dvliveblog_author_avt {
 
 .dvliveblog_adminactions .dvliveblog_deleteBT {
     color: red;
+}
+
+.dvliveblog_post_spinner_cont {
+    width: 100%;
+    text-align: center;
+}
+
+.dvliveblog_post_type1 {
+    background: #81cde4;
+}
+.dvliveblog_post_type1 .dvliveblog_post_content::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    color: #81cde4;
+    font-size: 1.25em;
+    content: '\f06a';
+}
+
+.dvliveblog_post_type2 {
+    background: #e8dfc1;
+}
+.dvliveblog_post_type2 .dvliveblog_post_content {
+    font-style: italic;
+}
+
+.tox-tinymce {
+    width: 100%;
 }
