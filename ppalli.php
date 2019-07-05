@@ -3,7 +3,7 @@
  * Plugin Name: Ppalli - Micro liveblogging plugin
  * Plugin URI: https://deedervel.com
  * Description: Micro liveblogging for Wordpress
- * Version:    2019.06.01
+ * Version:    2019.07.05
  * Author:     Mattia "DeederVel" Dui
  * Author URI:  https://deedervel.com
  * License:    CC BY-NC-SA 4.0

@@ -88,7 +88,11 @@ jQuery(document).ready(function($) {
         });
     })
 
-    refreshLiveBlogTimer = setInterval(refreshLiveBlog, dvliveblog_refreshrate);
+    try {
+        refreshLiveBlogTimer = setInterval(refreshLiveBlog, dvliveblog_refreshrate);
+    } catch(dvliveblog_err) {
+        
+    }
 
     tinymce.init({
         selector: '#dvliveblog_editor_text',
