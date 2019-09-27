@@ -1,6 +1,6 @@
 <?php
 
-namespace DeederVel;
+namespace Ppalli;
 
 define ('LIVEBLOG_PLUGINPATH', dirname( __FILE__ ));
 

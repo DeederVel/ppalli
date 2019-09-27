@@ -13,7 +13,7 @@
  */
 
 require_once(dirname( __FILE__ ).'/Core.php');
-use DeederVel\Core as Ppalli;
+use Ppalli\Core as Ppalli;
 
 function liveblog_render($title, $refreshrate) {
     global $post;
