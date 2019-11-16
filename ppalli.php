@@ -15,7 +15,7 @@
 require_once(dirname( __FILE__ ).'/Core.php');
 use Ppalli\Core as Ppalli;
 
-function liveblog_render($title, $refreshrate) {
+function liveblog_render($title, int $refreshrate = LIVEBLOG_DEFAULT_REFRESH) {
     global $post;
     $refreshrate = ($refreshrate > 0) ? ($refreshrate * 1000) : 5000;
     $ppalli = new Ppalli($post->ID);
@@ -37,7 +37,9 @@ function dvliveblog_sc_handler($atts) {
         'dvliveblog',
         plugins_url( '/css/front.css', __FILE__ )
     );
-    $lu = liveblog_render($atts['title'], intval($atts['secs']));
+    $seconds = isset($atts['secs']) ? intval($atts['secs']) : LIVEBLOG_DEFAULT_REFRESH;
+    $title = isset($atts['title']) ? $atts['title'] : 'Liveblog';
+    $lu = liveblog_render($title, $seconds);
     return $lu["content"];
 }
 

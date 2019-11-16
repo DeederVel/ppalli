@@ -3,6 +3,7 @@
 namespace Ppalli;
 
 define ('LIVEBLOG_PLUGINPATH', dirname( __FILE__ ));
+define ('LIVEBLOG_DEFAULT_REFRESH', 5);
 
 class Core {
     private $post;
@@ -41,12 +42,16 @@ class Core {
     public function getAllMoments($title="", $refreshrate=5000) {
         global $wpdb;
         $blogposts = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}dvliveblog WHERE post_id = $this->post AND type >= 0 ORDER BY id DESC");
+        $lastID = 0;
+        $ret = '';
+
         $mainTemplate = file_get_contents(LIVEBLOG_PLUGINPATH . '/html/main_template.html');
         $postTemplate = file_get_contents(LIVEBLOG_PLUGINPATH . '/html/post_template.html');
         $editorTemplate = file_get_contents(LIVEBLOG_PLUGINPATH . '/html/editor_template.html');
         $content = "";
-        $lastID = ($blogposts[0])->id;
-        if(!isset($lastID)) $lastID = 0;
+        if(count($blogposts) > 0) {
+            $lastID = ($blogposts[0])->id;
+        }
         foreach($blogposts as $bp) {
             $content .= $this->buildMoment($postTemplate, $bp);
         }
@@ -73,8 +78,6 @@ class Core {
         $ret = str_replace('{{content}}', $content, $ret);
         $time = (new \DateTime('now'))->format('H:i:s');
         $ret = str_replace('{{last_update}}', $time, $ret);
-
-
         return ["content" => $ret, "lastID" => $lastID];
     }
 
