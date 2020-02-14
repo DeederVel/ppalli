@@ -2,6 +2,9 @@
 
 namespace Ppalli;
 
+if (!defined( 'ABSPATH' )) {
+	exit;
+}
 define ('LIVEBLOG_PLUGINPATH', dirname( __FILE__ ));
 define ('LIVEBLOG_DEFAULT_REFRESH', 5);
 

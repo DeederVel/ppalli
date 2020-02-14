@@ -11,7 +11,9 @@
  * Text Domain: dvliveblog
  * Domain Path: /lang
  */
-
+if (!defined( 'ABSPATH' )) {
+	exit;
+}
 require_once(dirname( __FILE__ ).'/Core.php');
 use Ppalli\Core as Ppalli;
 
